@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorpresa para Fernando</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #050515;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+        }
+
+        input[type="radio"] { display: none; }
+
+        /* --- PANTALLAS --- */
+        .pantalla-etapa {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1b0f3a 0%, #050515 100%);
+            z-index: 200;
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px; box-sizing: border-box;
+        }
+
+        .pantalla-etapa::before, .universo::before {
+            content: ""; position: absolute; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(255, 0, 128, 0.12), transparent 40%),
+                        radial-gradient(circle at 70% 60%, rgba(0, 255, 204, 0.1), transparent 45%);
+            animation: moverNebulosa 20s linear infinite; z-index: -2; pointer-events: none;
+        }
+        @keyframes moverNebulosa { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .pantalla-etapa h1 {
+            font-size: 2.8rem; color: #00ffcc;
+            text-shadow: 0 0 25px #00ffcc, 0 0 50px rgba(0,255,204,0.5);
+            margin: 0 0 20px 0;
+        }
+
+        .pantalla-etapa p { font-size: 1.5rem; max-width: 550px; line-height: 1.6; margin: 0 0 20px 0; }
+
+        .contenedor-recuerdo { width: 300px; height: 300px; position: relative; margin-bottom: 25px; }
+        .img-recuerdo {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            border-radius: 20px; border: 4px solid #ff0055; box-shadow: 0 0 30px #ff0055;
+        }
+
+        .boton-continuar {
+            background: linear-gradient(45deg, #ff0055, #ff00aa);
+            color: white; padding: 14px 40px; border-radius: 35px;
+            font-size: 1.3rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 20px #ff0055; display: inline-block;
+            text-decoration: none; user-select: none; border: none; z-index: 210;
+        }
+
+        /* Lógica para pasar pantallas */
+        #control-etapa1:checked ~ #etapa1 { display: flex; }
+        #control-etapa2:checked ~ #etapa2 { display: flex; }
+        #control-etapa3:checked ~ #etapa3 { display: flex; }
+        #control-galaxia:checked ~ #universoContenedor { display: flex; }
+        #control-galaxia:checked ~ #universoContenedor .estrellas-fondo,
+        #control-galaxia:checked ~ #universoContenedor .contenedor-frases { display: block; }
+
+        /* --- UNIVERSO FINAL --- */
+        .universo {
+            display: none; position: relative; width: 650px; height: 650px;
+            justify-content: center; align-items: center;
+        }
+
+        .titulo-galaxia {
+            position: absolute; top: -60px; font-size: 2.6rem; color: #ff0055;
+            text-shadow: 0 0 25px #ff0055, 0 0 40px #ff0055; font-weight: bold; z-index: 50;
+        }
+
+        .centro-galaxia {
+            position: absolute; width: 140px; height: 140px; border-radius: 50%;
+            border: 4px solid #ff0055; box-shadow: 0 0 35px #ff0055;
+            overflow: hidden; z-index: 10;
+        }
+        .centro-galaxia img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 3 Órbitas Distribuidas */
+        .orbita {
+            position: absolute; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 50%;
+            z-index: 5;
+        }
+        .o1 { width: 280px; height: 280px; animation: rotar 12s linear infinite; }
+        .o2 { width: 440px; height: 440px; animation: rotar 18s linear infinite reverse; }
+        .o3 { width: 600px; height: 600px; animation: rotar 24s linear infinite; }
+        
+        @keyframes rotar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Posiciones */
+        .pos-arriba { position: absolute; top: -25px; left: calc(50% - 35px); width: 70px; height: 50px; }
+        .pos-abajo { position: absolute; bottom: -25px; left: calc(50% - 35px); width: 70px; height: 50px; }
+        .pos-derecha { position: absolute; right: -25px; top: calc(50% - 25px); width: 70px; height: 50px; }
+        .pos-izquierda { position: absolute; left: -25px; top: calc(50% - 25px); width: 70px; height: 50px; }
+
+        .hotwheels-carrito { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px #00ffcc); }
+
+        /* Frases en Movimiento */
+        .contenedor-frases { 
+            display: none; position: absolute; width: 100vw; height: 100vh; 
+            top: 0; left: 0; z-index: 100; pointer-events: none; overflow: hidden; 
+        }
+        .frase-flotante { 
+            position: absolute; font-size: 1.3rem; font-weight: bold; 
+            color: #00ffcc; text-shadow: 0 0 15px #00ffcc; white-space: nowrap; 
+            animation: flotarFrase linear infinite; 
+        }
+        .f-lin1 { top: 12%; animation-duration: 22s; }
+        .f-lin2 { top: 25%; color: #ff0055; text-shadow: 0 0 15px #ff0055; animation-duration: 26s; }
+        .f-lin3 { top: 75%; color: #ff0055; text-shadow: 0 0 15px #ff0055; animation-duration: 24s; }
+        .f-lin4 { top: 88%; animation-duration: 20s; }
+        @keyframes flotarFrase { 0% { transform: translateX(-100%); } 100% { transform: translateX(100vw); } }
+
+        .estrellas-fondo {
+            display: none; position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;
+            background-image: radial-gradient(circle, #fff 2px, transparent 40px), radial-gradient(circle, #fff 1.5px, transparent 30px);
+            background-size: 450px 450px, 350px 350px; animation: parpadeoEstrella 3s ease-in-out infinite; z-index: -2;
+        }
+        @keyframes parpadeoEstrella { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- REPRODUCTOR MULTIMEDIA -->
+    <audio id="musicaFondo" loop preload="auto">
+        <source src="cancion.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- NAVEGACIÓN -->
+    <input type="radio" name="etapas" id="control-etapa1" checked>
+    <input type="radio" name="etapas" id="control-etapa2">
+    <input type="radio" name="etapas" id="control-etapa3">
+    <input type="radio" name="etapas" id="control-galaxia">
+
+    <!-- ETAPA 1 -->
+    <div class="pantalla-etapa" id="etapa1">
+        <h1>✨ Toca acá ✨</h1>
+        <p style="color: #ff0055; font-weight: bold;">Tengo algo muy bonito preparado para ti...</p>
+        <label for="control-etapa2" class="boton-continuar" onclick="document.getElementById('musicaFondo').play();">Ver sorpresa ➔</label>
+    </div>
+
+    <!-- ETAPA 2 -->
+    <div class="pantalla-etapa" id="etapa2">
+        <div class="contenedor-recuerdo">
+            <img src="foto 1.jpg" class="img-recuerdo" onerror="this.src='foto 1.webp'; this.onerror=function(){this.src='foto 1.jpeg'; this.onerror=function(){this.src='foto 1.png';}}}">
+        </div>
+        <p>"Eres muy especial para mi y te quiero mucho"</p>
+        <label for="control-etapa3" class="boton-continuar">Continuar ➔</label>
+    </div>
+
+    <!-- ETAPA 3 -->
+    <div class="pantalla-etapa" id="etapa3">
+        <div class="contenedor-recuerdo">
+            <img src="foto 2.jpg" class="img-recuerdo" onerror="this.src='foto 2.webp'; this.onerror=function(){this.src='foto 2.jpeg'; this.onerror=function(){this.src='foto 2.png';}}}">
+        </div>
+        <p style="color: #00ffcc; font-weight: bold; font-size: 1.8rem; text-shadow: 0 0 15px #00ffcc;">
+            ¡Feliz 30 de septiembre amor!
+        </p>
+        <label for="control-galaxia" class="boton-continuar" onclick="document.getElementById('musicaFondo').play();">Descubrir tu galaxia 🌌</label>
+    </div>
+
+    <!-- UNIVERSO FINAL CON TUS 10 CARRITOS -->
+    <div class="universo" id="universoContenedor">
+        <div class="estrellas-fondo"></div>
+        <div class="contenedor-frases">
+            <div class="frase-flotante f-lin1">Eres mi persona favorita 💖</div>
+            <div class="frase-flotante f-lin2">A mil por hora contigo... 🏁</div>
+            <div class="frase-flotante f-lin3">Te amo más que a nada en el mundo 💕</div>
+            <div class="frase-flotante f-lin4">Coleccionando momentos a tu lado 🥰</div>
+        </div>
+
+        <div class="titulo-galaxia">Te amo Fernando ❤️</div>
+        
+        <div class="centro-galaxia">
+            <img src="foto-centro.jpg" onerror="this.src='foto-centro.webp'; this.onerror=function(){this.src='foto-centro.jpeg'; this.onerror=function(){this.src='foto-centro.png';}}}">
+        </div>
+
+        <!-- Órbita 1: Carritos f1 a f4 -->
+        <div class="orbita o1">
+            <div class="pos-arriba"><img src="f1.jpg" class="hotwheels-carrito" onerror="this.src='f1.webp'; this.onerror=function(){this.src='f1.jpeg'; this.onerror=function(){this.src='f1.png';}}}"></div>
+            <div class="pos-abajo"><img src="f2.jpg" class="hotwheels-carrito" onerror="this.src='f2.webp'; this.onerror=function(){this.src='f2.jpeg'; this.onerror=function(){this.src='f2.png';}}}"></div>
+            <div class="pos-derecha"><img src="f3.jpg" class="hotwheels-carrito" onerror="this.src='f3.webp'; this.onerror=function(){this.src='f3.jpeg'; this.onerror=function(){this.src='f3.png';}}}"></div>
+            <div class="pos-izquierda"><img src="f4.jpg" class="hotwheels-carrito" onerror="this.src='f4.webp'; this.onerror=function(){this.src='f4.jpeg'; this.onerror=function(){this.src='f4.png';}}}"></div>
+        </div>
+
+        <!-- Órbita 2: Carritos f5 a f8 -->
+        <div class="orbita o2">
+
